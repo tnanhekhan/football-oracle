@@ -2,7 +2,9 @@
 
 Ask a football question in plain English. Get a grounded answer, the generated SQL, and the rows behind it.
 
-[![Football Oracle demo](docs/demo-poster.jpg)](docs/demo.mp4)
+[![Football Oracle demo](docs/demo-poster.jpg)
+
+https://github.com/user-attachments/assets/8b22f4de-567e-4fbd-ba28-456b2367c0bb
 
 90-second walkthrough from the AKS test run: ask a question, inspect the SQL and rows, then follow up. The AKS endpoint was intentionally torn down after recording.
 
