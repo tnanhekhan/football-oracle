@@ -1,0 +1,17 @@
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+
+model_list:
+  - model_name: beam-free
+    litellm_params:
+      model: opencode_go/beam-free
+      api_key: os.environ/OPENCODE_API_KEY
+      extra_headers:
+        x-opencode-session: os.environ/OPENCODE_SESSION_ID
+  - model_name: deepseek-v4.1-flash
+    litellm_params:
+      model: opencode_go/deepseek-v4.1-flash
+      api_key: os.environ/OPENCODE_API_KEY
+      extra_headers:
+        x-opencode-session: os.environ/OPENCODE_SESSION_ID

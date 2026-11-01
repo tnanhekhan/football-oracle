@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: football-oracle
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: app }
+  template:
+    metadata:
+      labels: { app: app }
+    spec:
+      containers:
+        - name: backend
+          # Placeholder: docs/aks.md sets this to your ACR login server + tag.
+          image: "your-registry.azurecr.io/football-oracle-backend:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - { name: DUCKDB_PATH, value: /data/football.duckdb }
+            - { name: LITELLM_URL, value: "http://litellm:4000" }
+            - name: LITELLM_KEY
+              valueFrom: { secretKeyRef: { name: football-secrets, key: app-key } }
+            - name: APP_API_KEY
+              valueFrom: { secretKeyRef: { name: football-secrets, key: api-key } }
+            - { name: REDIS_URL, value: "redis://redis:6379/0" }
+            - { name: MOCK_LLM, value: "0" }
+            - { name: DEFAULT_MODEL, value: beam-free }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 1000m, memory: 1Gi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: football-oracle
+spec:
+  type: LoadBalancer
+  # Demo only: keep the endpoint off the public internet. 203.0.113.10/32 is
+  # a documentation placeholder; replace it with your public IP (docs/aks.md).
+  loadBalancerSourceRanges:
+    - 203.0.113.10/32
+  selector: { app: app }
+  ports:
+    - { port: 8000 }

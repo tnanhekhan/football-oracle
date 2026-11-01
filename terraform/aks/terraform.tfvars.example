@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars (gitignored) or pass -var flags.
+# The docs/aks.md runbook passes these values automatically.
+subscription_id = "00000000-0000-0000-0000-000000000000"
+location        = "swedencentral"
+node_vm_size    = "Standard_B2as_v2"
+acr_name        = "acrfootballdemo12345" # globally unique, alphanumeric
+allowed_ip      = "203.0.113.10/32"      # replace with your public IP

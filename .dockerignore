@@ -1,0 +1,34 @@
+# Never ship local secrets, state, or docs into the image.
+.env
+.env.*
+.git
+.gitignore
+.github
+.terraform
+*.tfstate*
+*.tfvars
+.vscode
+.idea
+*.log
+.hermes-tmp*
+
+frontend/node_modules
+frontend/dist
+
+# Not needed inside the image.
+terraform
+k8s
+docs
+demo.mp4
+data/*.csv
+data/**/*.csv
+__pycache__
+**/__pycache__
+*.pyc
+.venv
+venv
+docker-compose.yml
+litellm.yaml
+plan.md
+README.md
+LICENSE

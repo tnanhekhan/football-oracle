@@ -1,0 +1,71 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      args:
+        VITE_API_KEY: ${APP_API_KEY:-}
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DUCKDB_PATH: /data/football.duckdb
+      LITELLM_URL: http://litellm:4000
+      # Local demo: use the LiteLLM master key. Mint a scoped virtual key for
+      # a shared deployment.
+      LITELLM_KEY: ${LITELLM_MASTER:-sk-oracle-local}
+      APP_API_KEY: ${APP_API_KEY:-}
+      REDIS_URL: redis://redis:6379/0
+      MOCK_LLM: ${MOCK_LLM:-1}
+      DEFAULT_MODEL: beam-free
+    volumes:
+      - ./data:/data:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm.yaml:/app/config.yaml
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER:-sk-oracle-local}
+      OPENCODE_API_KEY: ${OPENCODE_API_KEY:-}
+      OPENCODE_SESSION_ID: ${OPENCODE_SESSION_ID:-}
+      DATABASE_URL: postgresql://litellm:${PG_PASSWORD:-litellm}@db:5432/litellm
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-litellm}
+      POSTGRES_DB: litellm
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # No volume: cache only, dies with the pod/container.
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  pgdata:

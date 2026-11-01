@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litellm
+  namespace: football-oracle
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: litellm }
+  template:
+    metadata:
+      labels: { app: litellm }
+    spec:
+      containers:
+        - name: litellm
+          image: "ghcr.io/berriai/litellm:main-latest"
+          args: ["--config", "/app/config.yaml", "--port", "4000"]
+          ports:
+            - containerPort: 4000
+          env:
+            - name: LITELLM_MASTER_KEY
+              valueFrom: { secretKeyRef: { name: football-secrets, key: litellm-master } }
+            - name: PG_PASSWORD
+              valueFrom: { secretKeyRef: { name: football-secrets, key: pg-password } }
+            - name: DATABASE_URL
+              value: "postgresql://litellm:$(PG_PASSWORD)@db:5432/litellm"
+            - name: OPENCODE_API_KEY
+              valueFrom: { secretKeyRef: { name: football-secrets, key: opencode-key } }
+            - name: OPENCODE_SESSION_ID
+              valueFrom: { secretKeyRef: { name: football-secrets, key: session-id } }
+          volumeMounts:
+            - { name: config, mountPath: /app/config.yaml, subPath: config.yaml }
+          readinessProbe:
+            tcpSocket: { port: 4000 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 1000m, memory: 1Gi }
+      volumes:
+        - name: config
+          configMap: { name: litellm-config }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: litellm
+  namespace: football-oracle
+spec:
+  selector: { app: litellm }
+  ports:
+    - { port: 4000 }

@@ -1,0 +1,17 @@
+MIT License
+
+Copyright (c) 2026 Football Oracle contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of the software (the application code in this repository) to deal in the
+software without restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the software, and to permit persons to whom the software is furnished to do
+so, subject to the inclusion of the above copyright notice in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+Note: this license covers the code, not the data. `data/football.duckdb`
+is derived from the Transfermarkt scrape (Kaggle davidcariboo/player-scores,
+CC0 Public Domain) and is gitignored for size, not rights — rebuild it
+locally with `build_duckdb.py`.
