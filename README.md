@@ -120,14 +120,6 @@ The dataset is the Transfermarkt scrape by David Cariboo ([davidcariboo/player-s
 - The AKS API server and app LoadBalancer are restricted to the deploying IP. Do not expose this demo publicly without an auth proxy and rate limits.
 - Rotate provider keys if they were ever committed or shared outside `.env`.
 
-## Status
-
-- [x] Docker Compose stack (backend, gateway, cache, database)
-- [x] Kubernetes manifests
-- [x] AKS test run (torn down after recording)
-- [x] GitHub Actions CI (frontend build + backend syntax)
-- [ ] Automated end-to-end evaluation suite
-
 ## Contributing
 
 Personal project, but feedback and issues are welcome.
